@@ -39,9 +39,7 @@ namespace json {
     }
 
     void Builder::DoValue(Node::Value value) {
-        Node node = std::visit([](auto&& arg) -> Node {
-            return Node{ std::forward<decltype(arg)>(arg) };
-            }, std::move(value));
+        Node node(std::move(value));
 
         if (stack_.empty()) {
             if (std::holds_alternative<std::nullptr_t>(root_.GetValue())) {
@@ -53,12 +51,12 @@ namespace json {
 
         Node& curr_node = Current();
         if (key_.has_value()) {
-            Dict& dict = const_cast<Dict&>(curr_node.AsDict());
+            Dict& dict = curr_node.AsDict();
             dict[key_.value()] = std::move(node);
             key_.reset();
         }
         else if (curr_node.IsArray()) {
-            Array& array = const_cast<Array&>(curr_node.AsArray());
+            Array& array = curr_node.AsArray();
             array.emplace_back(std::move(node));
         }
         else {
@@ -79,13 +77,13 @@ namespace json {
 
         Node& curr = Current();
         if (key_.has_value()) {
-            Dict& dict = const_cast<Dict&>(curr.AsDict());
+            Dict& dict = curr.AsDict();
             auto& new_node = dict[key_.value()] = std::move(dict_node);
             stack_.push_back(&new_node);
             key_.reset();
         }
         else if (curr.IsArray()) {
-            Array& array = const_cast<Array&>(curr.AsArray());
+            Array& array = curr.AsArray();
             array.emplace_back(std::move(dict_node));
             stack_.push_back(&array.back());
         }
@@ -107,13 +105,13 @@ namespace json {
 
         Node& curr = Current();
         if (key_.has_value()) {
-            Dict& dict = const_cast<Dict&>(curr.AsDict());
+            Dict& dict = curr.AsDict();
             auto& new_node = dict[key_.value()] = std::move(array_node);
             stack_.push_back(&new_node);
             key_.reset();
         }
         else if (curr.IsArray()) {
-            Array& array = const_cast<Array&>(curr.AsArray());
+            Array& array = curr.AsArray();
             array.emplace_back(std::move(array_node));
             stack_.push_back(&array.back());
         }
