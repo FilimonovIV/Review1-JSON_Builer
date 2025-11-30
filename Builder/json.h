@@ -5,6 +5,7 @@
 #include <string>
 #include <variant>
 #include <vector>
+#include <utility>
 
 namespace json {
 
@@ -22,6 +23,9 @@ namespace json {
     public:
         using variant::variant;
         using Value = variant;
+
+        // Разрешаем создание из Value
+        Node(Value value) : variant(std::move(value)) {}
 
         bool IsInt() const {
             return std::holds_alternative<int>(*this);
@@ -76,6 +80,10 @@ namespace json {
             return std::get<Array>(*this);
         }
 
+        Array& AsArray() {
+            return const_cast<Array&>(std::as_const(*this).AsArray());
+        }
+
         bool IsString() const {
             return std::holds_alternative<std::string>(*this);
         }
@@ -98,6 +106,10 @@ namespace json {
             }
 
             return std::get<Dict>(*this);
+        }
+
+        Dict& AsDict() {
+            return const_cast<Dict&>(std::as_const(*this).AsDict());
         }
 
         bool operator==(const Node& rhs) const {

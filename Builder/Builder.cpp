@@ -14,7 +14,7 @@ void TestArrayJSON();
 void TestDictJSON();
 void TestGeneralJSON();
 
-void PrintTestDescription(std::string_view msg);
+void PrintTestDescription(std::string_view msg, std::ostream& os = std::cout);
 
 // =============================================================================
 // Главная функция
@@ -43,11 +43,14 @@ int main() {
 // Вспомогательные функции
 // =============================================================================
 
-void PrintTestDescription(std::string_view msg) {
-    std::cout << "\n\n"
-        << "============================\n"
-        << msg << '\n'
-        << "============================\n";
+// Функция выводит сообщение, обрамлённое линиями из символов =,
+// длина которых подстраивается под текст (минимум 30).
+void PrintTestDescription(std::string_view msg, std::ostream& os) {
+    size_t width = std::max(static_cast<size_t>(30), msg.length() + 2);
+    std::string border(width, '=');
+    os << "\n" << border << '\n'
+       << msg << '\n'
+       << border << "\n";
 }
 
 // =============================================================================
